@@ -71,13 +71,9 @@ class Game:
 
         level = input(
             "Select Beginner, Intermediate, or Advanced: ").lower().strip()
-
-        while level not in ['beginner', 'intermediate', 'advanced']:
-            level = input(
-                "Select Beginner, Intermediate, or Advanced: ").lower().strip()
         self.level = series_levels[level]
 
-    def print_dCrypt_shun(self):
+    def display_status(self):
         """if letter selected by player is correct, store character in list and print concatenated letters"""
         log_attempts = self.player.attempts['right']
         """ if wrong, leave an underscored space for the character"""
@@ -100,6 +96,8 @@ class Game:
 
     def challenge(self):
         self.challenge()
+
+       # self.total_attempts()
         while self.playing:
             decrement = len(self.player.attempts["wrong"])
             print('\n'+'='*42)
@@ -114,16 +112,17 @@ class Game:
             else:
                 print('\n nCrypt Shun! 再試行(Sai shikō)\n')
                 print('\n *** Retry! ***\n')
+                self.player.attempts['wrong'].append(attempt)
 
-        self.print_dCrypt_shun()
+        self.display_status()
 
         log_attempts = self.player.attempts['right']
 
         """player wins game if concatenated chars in total_attempts matches characters in selected word"""
-        total_attempts == ''.join(
+        total_attempts = ''.join(
             [char for char in self.word if char in log_attempts])
 
-        if total_attempts == self.word:
+        if self.challenge == self.word:
             self.player.win = True
             self.playing = False
 
@@ -157,8 +156,6 @@ class Game:
                 exit()
             elif new_game == 'y':
                 print('\n *** Begin nCrypt dCrypt Shun! ***\n')
-
-                Game()
 
 
 class Player:
