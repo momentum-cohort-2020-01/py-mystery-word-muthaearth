@@ -43,7 +43,7 @@ class Game:
         novice, expert = self.level['novice'], self.level['expert']
         """ as long as selected word length for novice is less than or equal to selected word length for expert, pass a word into word"""
         while not (novice <= len(word) <= expert):
-            word = random.choices(words)
+            word = random.choice(words)
         self.word = word
 
         # i = 0
