@@ -13,17 +13,17 @@ gallows = ["_______\n|     |\n|     O\n|    -|-\n|     |\n|    / \\ \n|\n=======
 
 
 class Game:
-    def __init__(self, player_name):
+    def __init__(self):
         self.word = "gallows"
-        player_name = Player(input("Welcome to Hangman. What is your name? "))
-        print(f"Hello, {player_name}. Let's play!")
-        word_length()
+        name = input("Welcome to Hangman. What is your name? ")
+        print(f"Hello, Let's play!")
+        # word_length()
         self.start_game = ()
         self.playing = True
-        new_game = ()
+        # new_game = ()
 
-    def __str__(self):
-        return "Hangman Gallows"
+    # def __str__(self):
+    #     return "Hangman Gallows"
 
     def get_words(self):
         with open('words.txt', 'r') as f:
@@ -93,9 +93,6 @@ class Game:
                 if len(word) >= 14:
                     words.append(word)
                     return words
-
-
-class Player:
 
     def start_game(self):
         """Run the actual game of hangman."""
@@ -171,5 +168,4 @@ class Player:
 
 
 if __name__ == '__main__':
-    main()
-    Game.start.game()
+    Game()
