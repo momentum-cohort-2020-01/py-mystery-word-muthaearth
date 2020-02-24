@@ -1,8 +1,7 @@
 import random
 import sys
 
-
-Gallow printouts
+# Gallow printouts
 gallows = ["_______\n|     |\n|     O\n|    -|-\n|     |\n|    / \\ \n|\n=======",
            "_______\n|     |\n|     O\n|    -|-\n|     |\n|    /\n|\n=======",
            "_______\n|     |\n|     O\n|    -|-\n|     |\n|\n|\n=======",
@@ -12,144 +11,113 @@ gallows = ["_______\n|     |\n|     O\n|    -|-\n|     |\n|    / \\ \n|\n=======
            "_______\n|     |\n|\n|\n|\n|\n|\n=======",
            ]
 
+# Lists containing the words for the game
+five_letters = ['ankle', 'apple', 'birds', 'aunts', 'blood',
+                'bones', 'forty', 'glitz', 'gnome', 'goats',
+                'fairy', 'gator', 'glass', 'kneel', 'laces',
+                'patio', 'party', 'taffy', 'zones', 'wages'
+                ]
+ten_letters = ['jackrabbit', 'maximizers', 'abnormally', 'abolishers', 'adrenaline',
+               'california', 'basketball', 'friendship', 'renovation', 'skateboard',
+               'understand', 'leadership', 'restaurant', 'generation', 'girlfriend',
+               'vegetables', 'protection', 'trampoline', 'rainforest', 'instrument']
+fifteen_letters = ['maneuverability', 'insubordination', 'excommunication', 'acclimatization',
+                   'rationalisation', 'mischievousness', 'kindheartedness', 'procrastinating',
+                   'confidentiality', 'instrumentation', 'inaccessibility', 'marginalization']
 
-class Game:
-    def __init__(self):
-        self.player = Player(input("Welcome to Hangman. What is your name? "))
-        self.game_list = open("words.txt", "r")
-        self.generate_list()
-        self.play_game()
+# Program Functions
 
-    def generate_list(self):
-        self.game_list = self.game_list.read().split('\n')
 
-    def pick_diff(self, player, choice):
-        print("\nHello, " + self.player.name +
-              "Pick a level of difficulty. Novice - 8 letter words\n  Intermediate - 10 letter words\n  Expert - 15+ letter words\n>")
-        self.choice = input(
-            'Enter the number associated with level of difficulty you wish to play: ')
-        print("\t1. Beginner (11 guesses)")
-        print("\t2. Intermediate (9 guesses)")
-        print("\t3. Expert (7 guesses)")
+def pick_diff():
+    """Let the player pick and confirm a difficulty level."""
+    prompt = "Pick a difficulty, please. (Easy, Medium, Hard)\n>"
+    choice = ""
+    while choice not in ['easy', 'medium', 'hard']:
+        choice = input(prompt)
+        choice = choice.lower()
+    change_diff(choice)
 
-        if (str(self.choice) == "1"):
-            number_of_guesses = 8
-            print("\nYou have chosen %s and will receive %d guesses." %
-                  ("Beginner", number_of_guesses))
 
-        elif (str(self.choice) == "2"):
-            number_of_guesses = 7
-            print("\nYou have chosen %s and will receive %d guesses." %
-                  ("Intermediate", number_of_guesses))
-
-        elif (str(self.choice) == "3"):
-            number_of_guesses = 6
-            print("\nYou have chosen %s and will receive %d guesses." %
-                  ("Expert", number_of_guesses))
-
-        else:
-            print("\nNot a valid entry. Please try again\n")
-            self.choice = input(
-                'Enter the number associated with level of difficulty you wish to play: ')
-            return self.choice
-
-    def change_diff(self, pick_diff):
+def change_diff(level):
+    """Allow the player a chance to change difficulty."""
+    message = "\nYou picked " + level + ". Do you want to change it? [Y/N]\n>"
+    answer = ""
+    while answer not in ['y', 'n']:
+        answer = input(message)
+        answer = answer.lower()
+    if answer == 'y':
         pick_diff()
-        """Allow the player a chance to change difficulty level."""
-        message = "\nYou picked " + pick_diff + \
-            ".\nYou get six incorrect guesses before you lose.\nDo you want to change it? [Y/N]\n>"
-        answer = ""
-        while answer not in ['y', 'n']:
-            answer = input(message)
-            answer = answer.lower()
-        if answer == 'y':
-            pick_diff()
-        if answer == 'n':
-            print("\nHere we go!\n")
+    if answer == 'n':
+        print("\nLET'S PLAY!\n")
+        choose_word(level)
 
-    def word_length(self, level_choice):
-        words = []
 
-        for word in self.game_list:
+def choose_word(choice):
+    """Assign the game word based on player difficulty choice."""
+    if choice == 'easy':
+        word = random.choice(five_letters)
+    elif choice == 'medium':
+        word = random.choice(ten_letters)
+    elif choice == 'hard':
+        word = random.choice(fifteen_letters)
+    play_game(word)
 
-            if level_choice == 1 or level_choice == 'Beginner':
-                if len(word) >= 5 and len(word) <= 8:
-                    words.append(word)
 
-            elif level_choice == 2 or level_choice == 'Intermediate':
-                if len(word) >= 9 and len(word) <= 13:
-                    words.append(word)
-
-            elif level_choice == 3 or level_choice == 'Expert':
-                if len(word) >= 14:
-                    words.append(word)
-        return words
-
-    def random_word_list(self, level_choice):
-        list = self.word_length(level_choice)
-        random_word = random.choice(list)
-        return random_word.upper()
-
-    # def transform_random_list(self, word):
-    #     return list(word)
-
-    def start_over(self):
-        repeat = input('Would you like to play again? [Y/N]\n >').lower()
-        if repeat == "yes" or repeat == "y":
-            self.player.guesses = 8
-            self.start_over()
-
-        else:
-            print("Thanks for playing! Have a great day!")
-            sys.exit()
-
-    def play_game(self, game_list):
-        blanks = list("_" * len(self.game_list))
-        guessed = []
-        incorrect = 8
-
-        while incorrect > 0:
-            print("\n" + gallows[incorrect]
-                  + "\nYou have {} chances left.".format(incorrect)
-                  + "\nYour word: " + "".join(blanks)
-                    + "\nGuessed letters: " + ", ".join(guessed)
-                  )
-            letter = input("Your guess: ").lower()
-            if len(letter) == 1 and letter.isalpha():
-                if letter in guessed:
-                    print("\n\nYou already guessed that!")
-                elif letter in word:
-                    for index, character in enumerate(word):
-                        blanks = list(blanks)
-                        if character == letter:
-                            blanks[index] = letter
-                            # word_guess = "".join(blanks)
-                            return blanks
+def play_game(this_word):
+    """Run the actual game of hangman."""
+    word = list(this_word)
+    blanks = "_" * len(word)
+    blanks = list(blanks)
+    guessed = []
+    incorrect = 6
+    while incorrect > 0:
+        print("\n" + gallows[incorrect]
+              + "\nYou have {} chances left.".format(incorrect)
+              + "\nYour word: " + "".join(blanks)
+              + "\nGuessed letters: " + ", ".join(guessed)
+              )
+        letter = input("Your guess: ").lower()
+        if len(letter) == 1 and letter.isalpha():
+            if letter in guessed:
+                print("\n\nYou already guessed that!")
+            elif letter in word:
+                for index, character in enumerate(word):
+                    blanks = list(blanks)
+                    if character == letter:
+                        blanks[index] = letter
+                        current = "".join(blanks)
                         if blanks == word:
                             print(
                                 "\n\nCONGRATULATIONS, YOU WON!!\nYour word was " + ''.join(word) + ".\n")
-                            self.start_over()
-                            break
-
-                elif letter not in word:
-                    incorrect -= 1
-                    guessed.append(letter)
-                    print("\n\n!Only single letters allowed!\n\n")
-
-            else:
-                print(gallows[0])
-                print("\nSorry, your game is over!\nYour word was " +
-                      ''.join(word) + ".")
-                self.start_over()
-                break
+                            play_again()
+            elif letter not in word:
+                incorrect -= 1
+                guessed.append(letter)
+        else:
+            print("\n\n!Only single letters allowed!\n\n")
+    else:
+        print(gallows[0])
+        print("\nSorry " + player +
+              ", your game is over!\nYour word was " + ''.join(word) + ".")
+        play_again()
 
 
-class Player:
-    def __init__(self, name):
-        self.name = nameAnn
+def play_again():
+    """Offer the player a chance to play again."""
+    repeat = input("Would you like to play again " +
+                   player + "? [Y/N]\n>").lower()
+    if repeat == 'y':
+        print("Let's play!")
+        pick_diff()
+    else:
+        print("Thanks for playing! Have a great day!")
+        sys.exit()
 
-    def __str__(self):
-        return f"{self.name}"
 
+# Welcome the player, get their name and explain the game.
+player = input("Let's play hangman! Please type your name.\n>").lower()
+player = player.title()
+print("\nHey, " + player + "!\nYou get six incorrect guesses before you lose.\nWhich difficulty would you like?\n  Easy - Five letter word\n  Medium - Ten letter word\n  Hard - Fifteen letter word")
 
-game = Game()
+# Select the difficulty and begin the game
+play = pick_diff()
