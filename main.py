@@ -1,7 +1,8 @@
 import random
 import sys
 
-# Gallow printouts
+
+Gallow printouts
 gallows = ["_______\n|     |\n|     O\n|    -|-\n|     |\n|    / \\ \n|\n=======",
            "_______\n|     |\n|     O\n|    -|-\n|     |\n|    /\n|\n=======",
            "_______\n|     |\n|     O\n|    -|-\n|     |\n|\n|\n=======",
@@ -14,26 +15,17 @@ gallows = ["_______\n|     |\n|     O\n|    -|-\n|     |\n|    / \\ \n|\n=======
 
 class Game:
     def __init__(self):
-        self.word = "gallows"
-        name = input("Welcome to Hangman. What is your name? ")
-        print(f"Hello, Let's play!")
-        # word_length()
-        self.start_game = ()
-        self.playing = True
-        # new_game = ()
+        self.player = Player(input("Welcome to Hangman. What is your name? "))
+        self.game_list = open("words.txt", "r")
+        self.generate_list()
+        self.play_game()
 
-    # def __str__(self):
-    #     return "Hangman Gallows"
+    def generate_list(self):
+        self.game_list = self.game_list.read().split('\n')
 
-    def get_words(self):
-        with open('words.txt', 'r') as f:
-            words = f.readlines()
-            words = [word.strip().upper() for word in words]
-            return words
-
-    def pick_diff(self, choice):
-        """Let the player pick and confirm a difficulty level."""
-        prompt = "Pick a level of difficulty. (Easy, Medium, Hard)\n>"
+    def pick_diff(self, player, choice):
+        print("\nHello, " + self.player.name +
+              "Pick a level of difficulty. Novice - 8 letter words\n  Intermediate - 10 letter words\n  Expert - 15+ letter words\n>")
         self.choice = input(
             'Enter the number associated with level of difficulty you wish to play: ')
         print("\t1. Beginner (11 guesses)")
@@ -76,10 +68,9 @@ class Game:
             print("\nHere we go!\n")
 
     def word_length(self, level_choice):
-        words = self.get_words()
-        word = random.choice(words)
+        words = []
 
-        for word in words:
+        for word in self.game_list:
 
             if level_choice == 1 or level_choice == 'Beginner':
                 if len(word) >= 5 and len(word) <= 8:
@@ -92,19 +83,36 @@ class Game:
             elif level_choice == 3 or level_choice == 'Expert':
                 if len(word) >= 14:
                     words.append(word)
-                    return words
+        return words
 
-    def start_game(self):
-        """Run the actual game of hangman."""
-        word = list(self.word)
-        blanks = list("_" * len(word))
+    def random_word_list(self, level_choice):
+        list = self.word_length(level_choice)
+        random_word = random.choice(list)
+        return random_word.upper()
+
+    # def transform_random_list(self, word):
+    #     return list(word)
+
+    def start_over(self):
+        repeat = input('Would you like to play again? [Y/N]\n >').lower()
+        if repeat == "yes" or repeat == "y":
+            self.player.guesses = 8
+            self.start_over()
+
+        else:
+            print("Thanks for playing! Have a great day!")
+            sys.exit()
+
+    def play_game(self, game_list):
+        blanks = list("_" * len(self.game_list))
         guessed = []
-        incorrect = 7
+        incorrect = 8
+
         while incorrect > 0:
             print("\n" + gallows[incorrect]
                   + "\nYou have {} chances left.".format(incorrect)
                   + "\nYour word: " + "".join(blanks)
-                  + "\nGuessed letters: " + ", ".join(guessed)
+                    + "\nGuessed letters: " + ", ".join(guessed)
                   )
             letter = input("Your guess: ").lower()
             if len(letter) == 1 and letter.isalpha():
@@ -115,57 +123,33 @@ class Game:
                         blanks = list(blanks)
                         if character == letter:
                             blanks[index] = letter
-                            # current = "".join(blanks)
-                            if blanks == word:
-                                print(
-                                    "\n\nCONGRATULATIONS, YOU WON!!\nYour word was " + ''.join(word) + ".\n")
-                                play_again(self.word)
+                            # word_guess = "".join(blanks)
+                            return blanks
+                        if blanks == word:
+                            print(
+                                "\n\nCONGRATULATIONS, YOU WON!!\nYour word was " + ''.join(word) + ".\n")
+                            self.start_over()
+                            break
+
                 elif letter not in word:
                     incorrect -= 1
                     guessed.append(letter)
+                    print("\n\n!Only single letters allowed!\n\n")
+
             else:
-                print("\n\n!Only single letters allowed!\n\n")
-        else:
-            print(gallows[0])
-            print("\nSorry " + player +
-                  ", your game is over!\nYour word was " + ''.join(word) + ".")
-
-        self.end_game()
-
-    def end_game(self):
-        if self.player.win:
-            print('\n *** You Won! ***\n')
-
-        else:
-            print('\n *** You Lost! ***\n')
-
-    # new_game()
-
-    def new_game(self):
-        """ Ofer to play game again"""
-        repeat = input('Would you like to play again? [Y/N]\n >').lower()
-        if repeat == "yes" or repeat == "y":
-
-            """Welcome the player"""
-            player = input(
-                "Let's play Hangman! Please type your name.\n>").title()
-            print("\nHello, " + player + "!\nWhich difficulty would you like?\n  Novice - Eight letter words\n  Intermediate - Ten letter words\n  Expert - Fifteen+ letter words")
-
-            # Select the difficulty and begin the game
-            pick_diff()
-
-        else:
-            play_again = False
-            print("Thanks for playing! Have a great day!")
-            sys.exit()
-# loop end
+                print(gallows[0])
+                print("\nSorry, your game is over!\nYour word was " +
+                      ''.join(word) + ".")
+                self.start_over()
+                break
 
 
-# class Player:
-#     def __init__(self):
-#         self.attempts = {'right': [], 'wrong': []}
-#         self.win = False
+class Player:
+    def __init__(self, name):
+        self.name = nameAnn
+
+    def __str__(self):
+        return f"{self.name}"
 
 
-if __name__ == '__main__':
-    Game()
+game = Game()
