@@ -1,6 +1,8 @@
 import random
 import sys
 
+"""This simplified hangman game works"""
+
 # Gallow printouts
 gallows = ["_______\n|     |\n|     O\n|    -|-\n|     |\n|    / \\ \n|\n=======",
            "_______\n|     |\n|     O\n|    -|-\n|     |\n|    /\n|\n=======",
